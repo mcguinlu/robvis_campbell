@@ -1,5 +1,4 @@
-# robvis_campbell
-Presentation to the Campbell UK &amp; Ireland seminar series on open-source tool development in the field of evidence synthesis
+# Presentation to the Campbell UK &amp; Ireland seminar series on open-source tool development in the field of evidence synthesis
 
 <a href="https://mcguinlu.github.io/robvis_campbell/slides.html" target="_blank" rel="noopener noreferrer">Link to slides</a>
 
