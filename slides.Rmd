@@ -24,11 +24,11 @@ knitr::opts_chunk$set(include = FALSE)
 
 ``` {r, echo = FALSE, message = FALSE}
 htmltools::includeCSS("https://raw.githubusercontent.com/malcolmbarrett/kakashi/master/kakashi.css")
+library(metafor)
 library(robvis)
 cache <- TRUE
 library(dplyr)
-xaringanExtra::use_xaringan_extra(c("tile_view", "webcam"))
-
+xaringanExtra::use_xaringan_extra(c("tile_view", "webcam","scribble"))
 
 table <- function(dat, fontsize="11pt", rows = nrow(dat)){
 DT::datatable(
@@ -41,6 +41,7 @@ DT::datatable(
     paste0("  $(thead).css('font-size', '",fontsize,"');"),
     "}"
   ),
+  dom = 't',
   columnDefs = list(list(className = 'dt-center', targets = "_all"))
 ),
     
@@ -59,14 +60,14 @@ DT::datatable(
 ]
 ]
 
-## Incorporating risk-of-bias assessments into evidence syntheses with `robvis`
+## Visualising risk-of-bias assessments in systematic reviews: an introduction to the open-source `robvis` tool
 
 <br>
 
 __Luke McGuinness__<br>
 
 .small[
-.image-smallest[![](figures/building.png)] Honorary Snr Research Associate, 
+.image-smallest[![](figures/building.png)] Honorary Senior Research Associate, 
   University of Bristol Medical School
 
 .image-smallest[![](figures/Twitter-featured.png)] mcguinlu
@@ -78,12 +79,9 @@ __Luke McGuinness__<br>
 
 Hello, I'm Luke McGuinness, a PhD student at the University of Bristol Medical School
 
-Sorry I couldn't attend this presentation live in the chat.
-
 I'm going to talk today about incorporating the resuls of risk-of-bias assessments int
 
-And just to note that all the work presented today would not have been possible without my amazing collaborators, Alex Fowler and Randall Boyes
-
+Acknowledge amazing collaborators, Alex Fowler and Randall Boyes
 
 ---
 
@@ -94,19 +92,84 @@ class: inverse, center, middle
 
 ---
 
-## Making ROB figures was a pain
+## Risk-of-bias assessments
 
-No 
+Important part of __evidence synthesis__ process
 
-Process was time-consuming and error-prone
+--
 
-Using Adobe, 
+Different __tools__ for different __study designs__, e.g.:
 
-Better to automate it
+.small[
+
+* __ROB2__ - randomised controlled trials
+
+* __ROBINS-I/E__ - non-randomised studies of interventions/exposures
+
+]
+
+--
+
+Assessments are __result__ rather than __study__ specific
+
+--
+
+Judgements in __several sub-domains__ informs the __overall level__
+
+---
+
+## Example risk of bias dataset for ROB2
+
+```{r, include = TRUE, echo = FALSE }
+set.seed(5)
+table(rob_dummy(9), "17pt")
+```
 
 ???
 
-Available via RevMan, but not open to all - not open source!
+Domains:
+(1) bias arising from the randomization process;
+(2) bias due to deviations from intended interventions;
+(3) bias due to missing outcome data;
+(4) bias in measurement of the outcome;
+(5) bias in selection of the reported result.
+
+---
+
+## Making ROB figures was (is?) a pain
+
+No __readily available__ way to create risk-of-bias figures
+
+
+--
+
+Proprietary tools (__RevMan__) limited to certain reviews (__Cochrane__)
+
+???
+
+RevMan not open source
+
+--
+
+Process (PPT, Adobe, etc) was __time-consuming__ and __error-prone__
+
+???
+
+Hours clicking and dragging
+
+--
+
+<br>
+
+.center[
+
+.larger[
+
+**Q: Can I make this process any easier?**
+
+]
+
+]
 
 ---
 
@@ -117,11 +180,45 @@ class: inverse, center, middle
 
 ---
 
-##  The `robvis` package 
+.pull-left[
 
-__R package__ and __web app__ to create publication-quality risk-of-bias visualisations
+## In the beginning...
 
-__Currently can produce two types of plots:__
+<br>
+* Collection of local non-reproducible R scripts
+<br>
+
+* **UNTIL...** Evidence Synthesis Hackathon 2019, Canberra, Australia
+
+]
+
+.pull-right[
+.middle[
+.center[
+
+![](figures/esh_hex.png)
+
+]]]
+
+
+
+---
+
+## `robvis` 
+
+During __ESH__, the `robvis` __R package__ was born
+
+--
+
+Aim -  to create __publication-quality__ risk-of-bias visualisations
+
+--
+
+A __web app__ was added later to __maximise potential users__
+
+--
+
+Initially could produce __two types of plots:__
 * Traffic-light plots
 * Summary barplots
 
@@ -135,8 +232,10 @@ robvis built to make these data more visually appealing
 
 ---
 
+class: larger
+
 ```{r, include = TRUE, eval = FALSE}
-data_rob2
+robvis::data_rob2 # ROB2 example dataset included in robvis
 ```
 
 --
@@ -170,6 +269,9 @@ class: center
 ???
 
 Same data as before just presented as a bar chart instead
+
+Can be weighted so that the proportion of information rather than the proportion of studies at each risk of bias level is shown.
+
 ---
 
 class: center, middle
@@ -178,7 +280,7 @@ class: center, middle
 
 ???
 
-Just to illstrate how easy it is to use
+Just to illustrate how easy it is to use
 
 ---
 
@@ -189,26 +291,51 @@ class: inverse, center, middle
 
 ---
 
-## Citations
+## Reception
 
+Paper published in 2019:
+
+.small[
+> _Luke A McGuinness and Julian PT Higgins (2020). Risk-of-bias VISualization (robvis): An R package and Shiny web app for visualizing risk-of-bias assessments Research Synthesis Methods. https://doi.org/10.1002/jrsm.1411_
+]
+
+--
+
+Since then:
+
+* .small[Citations: >750]
+
+--
+
+* .small[Downloads: >500/month]
+
+--
+
+* .small[Emails asking for help: >15/month]
+
+---
+class: center
+
+## >30k visitors to the `robvis` web app
+.middle[
+
+![](figures/user_map.jpg)]
+
+???
+
+>30000 visitors over 3 years
 
 ---
 
-## Downloads
-
----
-
-## Visitors
-
-* Include map of alltime visits on Google Analyics
+class: center
 
 
----
+## `robvis` was much more successful than expected!
 
-class: center, middle
+--
 
-
-![](figures/finding-nemo-bags.gif)
+<img src="figures/finding-nemo-bags.gif"
+     width="1100px" height="480px">
 ???
 
 So on the basis that I now have an 
@@ -248,19 +375,20 @@ Also useful to perform __sub-group meta-analysis__ by risk-of-bias level
 Insufficient to simply perform the assessments, create the figure and not actively think about what this means for your meta-analysis
 
 ---
+class: center, middle
 
-Evidence that this is happening - cite paper
+.left-column[
+__Problem illustrated by meta-epidemiology studies (reviews of reviews)__
 
+__Not all reviews make use of ROB data in synthesis__
+]
 
----
+![](figures/incorp_1.jpg)
+<br>
+<br>
+![](figures/incorp_2.jpg)
 
-Why this is important - a case study of COVID
-
-* Stratifying by ROB level showed
-
-??? 
-
-All things relate back to COVID
+.footer[https://doi.org/10.1136/jech-2014-204711, https://doi.org/10.1136/bmjnph-2021-000248]
 
 ---
 
@@ -268,58 +396,90 @@ class: Largest
 
 ## New problems
 
-How can robvis help to:
+How can **robvis** help to:
 
-1. ... to incorporate results into synthesis?
+1. ... **incorporate ROB assessments** into synthesis?
 
 --
 
-1. ... to "triangulate" across study designs?
+1. ... highlight **meta-biases**?
 
+--
+
+<br>
+
+.small[
+__Note -__ currently only available via development version:
+
+```{r, include =TRUE, eval=FALSE}
+devtools::install_github("mcguinlu/robvis")
+
+```
+]
 ---
 
 class: inverse, center, middle
 
 # Chapter 5:
-# Secret new functionality
-
----
-
-## `rob_dummy`
-
-* `robvis` is now being used in teaching
-
-* Need for "realistic" risk-of-bias assessment datasets
-``` {r, include = TRUE, echo = FALSE}
-
-
-table(data_rob2[5,],"13pt")
-
-```
-
----
-
-## `rob_forest`
-
-* Drop-in replacement for **metafor::forest()**
-
-* Maintains pairing between result and bias assessment
-
-* Allows for subgroup analysis by overall risk-of-bias level
-
-
-
----
-
-## `rob_direction`
+# New functionality
 
 ---
 
 class: middle
 
-##  metafor + robvis
+##  Dummy data
 
-_Paired_ forest/risk-of-bias plots
+Generate _realistic_ example risk-of-bias assessments
+
+???
+
+---
+
+## Dummy data
+
+Need for __"realistic"__ example risk-of-bias assessment datasets
+
+???
+
+One thing I never expected was that robvis would now be used in teaching
+
+As such, there is a need to be able to general
+
+Each judgement within the has a different expected frequency
+
+--
+
+```{r, include = TRUE, eval = FALSE, echo = TRUE}
+data_rob2[5,] # 5th study in the ROB2 example dataset
+```
+
+``` {r, include = TRUE, echo = FALSE}
+table(data_rob2[5,],"13pt")
+```
+
+--
+
+```{r, include = TRUE, eval = FALSE, echo = TRUE}
+rob_dummy(3) # Three randomly generated assessments for ROB2, with appropriate 'Overall' values
+```
+
+```{r include = TRUE, echo = FALSE}
+set.seed(5)
+
+table(rob_dummy(3),"13pt")
+```
+
+???
+
+rob_dummy() also takes a `tool` argument, so that you can generate assessments for multiple different ROB tools
+
+---
+
+class: middle
+
+## Paired forest plots
+
+Integrate metafor + robvis to produce _paired_ forest/risk-of-bias plots
 
 ???
 
@@ -327,51 +487,11 @@ Going to walk you though an example of producing these paired using metafor, and
 
 ---
 
-### Explore the datasets
+## Paired forest plots
 
-`metafor` data - 13 trials of effectiveness of BCG vaccine against tuberculosis
+Create "paired" dataset:
 
 ```{r}
-
-library(metafor)
-library(robvis)
-
-```
-
-```{r dataset, include = TRUE}
-table(dat.bcg)
-```
-
----
-
-### Explore the datasets
-
-`robvis` data - 13 (fake) risk of bias assessments performed using RoB2 for randomised trials
-
-
-```{r dataset2}
-dat.bcg.rob <- rbind(robvis::data_rob2, robvis::data_rob2[1:4,])
-dat.bcg.rob$Study <- paste(dat.bcg$author,dat.bcg$year)
-
-```
-
-```{r dataset3, include =TRUE}
-dat.bcg.rob
-```
-
-??? 
-
-Note that these are example assessments from the robvis package
-
-Doubling up to make the N of studies match the N of assessments
-
-Notice that the names are the same
-
----
-
-#### Standard approach
-
-```{r meta-analysis, include = TRUE}
 # Calculate the effect size and sampling variance for each study
 dat <- metafor::escalc(
     measure = "RR",
@@ -379,10 +499,11 @@ dat <- metafor::escalc(
     data = dat.bcg,
     slab = paste(author, year))
 
-dat <- cbind(dat, dat.bcg.rob)
+set.seed(5)
+dat <- cbind(dat,
+             rob_dummy(13,study = F))
 
-# Perform meta-anlysis and plot results
-res <- metafor::rma(yi, vi, data = dat)
+dat <- dat %>% select(author, year, yi,vi,matches("D."),Overall)
 
 ```
 
@@ -390,9 +511,32 @@ res <- metafor::rma(yi, vi, data = dat)
 head(dat,2) %>%
     mutate(vi = round(vi,2),
          yi = round(yi,2)) %>% 
-table()
+table(fontsize = "16pt")
 
 ```
+
+???
+
+Example dataset that uses:
+  metadat::dat.bcg
+  rob_dummy
+  
+Only showing the first two rows here for illustration purposes, but there are 13 results in total
+
+--
+
+<br>
+Perform straightforward RE meta-analysis using `metafor`:
+
+```{r meta-analysis, include = TRUE}
+res <- metafor::rma(yi, # Effect sizes
+                    vi, # Sampling variances
+                    data = dat, # Dataset
+                    slab = paste(author,year)) # Study label
+
+```
+
+
 ???
 
 So we use the escalc function to generate our study effect sizes and sampling variances from the raw counts
@@ -401,12 +545,10 @@ This data is then passed to a simple random effects meta-analytical model, and t
 
 ---
 
-#### Standard approach
+## Paired forest plots
 
 ```{r, include = TRUE, message=FALSE, fig.align="center", fig.width=9, fig.height=6}
-
 metafor::forest(res)
-
 ```
 
 ???
@@ -419,74 +561,112 @@ I'm now going to walk you through two ways in which robvis can add to this stand
 
 ---
 
-#### Option #1: `rob_append_to_forest()`
+## Paired forest plots
 
-```{r, include = TRUE, message=FALSE, fig.align="center", fig.width=9, fig.height=6}
-#robvis::rob_append_to_forest(res, dat.bcg.rob)
+`rob_forest()`
+
+* Drop-in replacement for **metafor::forest()**
+
+* Maintains pairing between __result__ and __bias assessment__
+
+* Allows for subgroup analysis by __overall risk-of-bias level__
+
+---
+
+```{r, include = FALSE, echo = TRUE, warning= FALSE,message=FALSE, fig.align="center", fig.width=9, fig.height=6}
+png("figures/rob_forest.png",width = 1200, height = 700)
+rob_forest(res)
+dev.off()
 ```
+
+```{r, include = TRUE, eval = FALSE}
+rob_forest(res)
+```
+
+![](figures/rob_forest.jpg)
+
 
 ???
 
 This function acts as a wrapper to the metafor::forest function and appends a risk of bias plot to the right hand side
 
-Important that the study names are the same in both the results object and the risk of bias dataset (for matching)
-
 This is only possible due to the foresight of the metafor package developer, who ensured that the forest function could be built upon.
-
----
-
-#### Option #2: `rob_blobbogram()`
-
-
-```{r, include = FALSE}
-#rob_blobbogram(res, dat.bcg.rob,file_path = "figures/forester.png")
-```
-
-```{r, include = TRUE, eval = FALSE}
-#rob_blobbogram(res, dat.bcg.rob)
-```
-
-```{r forest, fig.align='center', include = TRUE, echo = FALSE, out.width="60%"}
-#knitr::include_graphics("figures/forester.png")
-```
-
-???
-
-Option to is a bit more sophisticated
 
 Takes whatever meta-analytical model you have specified (though limited to metafor for now) and applies it across studies grouped by risk of bias level.
 
-This function leans heavily on the amazing forester package built by Randall Boyes
+Presents test of difference between the different 
 
-This function is still in development, and so some aspect are not finalised - for example, we still need to improve reporting by subgroup and make it clearer which are study vs summary effects
-
-Though, who knows potentially by the time you all see this next week, I'll have worked out the last few issues!
 
 ---
 
-#### Option #2: `rob_blobbogram()`
+## Case study: Ivermectin for COVID-19
 
-```{r, include = FALSE}
-#rob_blobbogram(res, dat.bcg.rob, subset_col = "D1", file_path = "figures/forester2.png")
-```
+Study of 12 trials of __Ivermectin__ for treatment of __COVID-19__
 
-```{r, include = TRUE, eval = FALSE}
-#rob_blobbogram(res, dat.bcg.rob, subset_col = "D1")
-```
+--
 
-```{r forest2, fig.align='center', include = TRUE, echo = FALSE, out.width="55%",out.height="90%"}
-#knitr::include_graphics("figures/forester2.png")
-```
+__Protective overall effect__ - OR: 0.62 (95%CI: 0.39-0.99)
+
+--
+
+Re-analysis performed ROB assessments of included trials:
+
+* 4 at Low
+* 4 at Some concerns
+* 3 at High
+* 1 at critical (excluded)
+
+.footer[https://www.researchsquare.com/article/rs-1003006/v1]
+
+???
+
+Re-analysis by Hill, Mirchandani, and Pilkington 
+
+---
+
+## Case study: Ivermectin for COVID-19
+
+<img src="figures/rob_ivermectin.jpg"
+     height="500px">
 
 ??? 
 
-One potential added advantage of this approach is that you can subset the studies based not only on the overall risk of bias, but on any of the domains.
+1 study excluded as critical risk of bias
 
-So here, we are subsetting by D1 which in the ROB2 tool is bias due to randomisation
+No domain-level information
+
+In summary, risk-of-bias assesments should be presented alongside their corresponding numerical result in forest plots, as it allows you to easily assess the underlying validity of information going into the meta-analysis.
 
 ---
 
+## Risk of bias due to missing evidence (ROB-ME)
 
+New tool to assess bias at the level of the synthesis:
+.small[
+
+* Known unknowns: results we know are missing
+
+* Unknown unknowns: results we have no idea exist
+
+]
+
+`robvis` allows for the result of this assessment to be included in the plot
+
+.footer[https://www.riskofbias.info/welcome/rob-me-tool]
+
+---
+
+```{r, include = FALSE, echo = TRUE, warning= FALSE,message=FALSE, fig.align="center", fig.width=9, fig.height=6}
+png("figures/rob_forest_me.png",width = 1200,height = 700)
+rob_forest(res, rob_me = "High")
+dev.off()
+```
+
+```{r, include = TRUE, eval= FALSE}
+rob_forest(res, rob_me = "High")
+```
+
+![](figures/rob_forest_me.jpg)
 
 ---
 
@@ -497,33 +677,29 @@ class: inverse, center, middle
 
 ---
 
-## Recap
-
----
-
-## Where to next?
-
----
-
-## Get involved
-
----
-
-class: largest
-
-
 ##  Take-home messages 
 
-__For users__
 * Risk-of-bias assessments should be __presented alongside the corresponding result__
+
 * Risk-of-bias level should be investigated as a __source of heterogeneity__
 
---
+* Readers should be made aware of the risk of __meta-bias__ in an analysis
 
-__For developers__
-* Keep an eye out for potential ways to __build on existing evidence synthesis__ packages to expand user functionality
-* On the flip-side, think about how others might build on your packages (and what information they'll need!)
+* New functionality in `robvis` __can help__ with this!
 
+---
+
+## Where to next? Bias direction plots!
+
+Optional question at end of each domain- e.g. D1 of ROBINS-I:
+.small[
+> What is the predicted direction of
+bias due to confounding?
+
+>Favours experimental /Favours comparator/ Unpredictable
+]
+
+![](figures/direction.jpg)
 
 ---
 

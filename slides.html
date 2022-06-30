@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>slides.knit</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/hygge.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <script src="libs/xaringanExtra-webcam/webcam.js"></script>
+    <script id="xaringanExtra-webcam-options" type="application/json">{"width":"200","height":"200","margin":"1em"}</script>
+    <script src="libs/fabric/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <script src="libs/jquery/jquery-3.6.0.min.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+.col-right2[
+.center[
+![](figures/robvis_hex.png)
+]
+]
+
+## Visualising risk-of-bias assessments in systematic reviews: an introduction to the open-source `robvis` tool
+
+&lt;br&gt;
+
+__Luke McGuinness__&lt;br&gt;
+
+.small[
+.image-smallest[![](figures/building.png)] Honorary Senior Research Associate, 
+  University of Bristol Medical School
+
+.image-smallest[![](figures/Twitter-featured.png)] mcguinlu
+
+.image-smallest[![](figures/Github-32.png)] mcguinlu
+]
+
+???
+
+Hello, I'm Luke McGuinness, a PhD student at the University of Bristol Medical School
+
+I'm going to talk today about incorporating the resuls of risk-of-bias assessments int
+
+Acknowledge amazing collaborators, Alex Fowler and Randall Boyes
+
+---
+
+class: inverse, center, middle
+
+# Chapter 1:
+# The (Original) Problem
+
+---
+
+## Risk-of-bias assessments
+
+Important part of __evidence synthesis__ process
+
+--
+
+Different __tools__ for different __study designs__, e.g.:
+
+.small[
+
+* __ROB2__ - randomised controlled trials
+
+* __ROBINS-I/E__ - non-randomised studies of interventions/exposures
+
+]
+
+--
+
+Assessments are __result__ rather than __study__ specific
+
+--
+
+Judgements in __several sub-domains__ informs the __overall level__
+
+---
+
+## Example risk of bias dataset for ROB2
+
+<div id="htmlwidget-42cd4a0edf735ca84dea" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-42cd4a0edf735ca84dea">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["Study 1","Study 2","Study 3","Study 4","Study 5","Study 6","Study 7","Study 8","Study 9"],["Low","Some concerns","High","Low","Low","Some concerns","Low","Some concerns","High"],["Low","Low","Low","Low","Low","Low","Low","Low","High"],["Low","Some concerns","High","Some concerns","Low","Low","Low","Low","Low"],["High","Low","High","Low","Low","Low","Low","Low","Low"],["Low","Low","Low","Low","Some concerns","Low","Some concerns","Low","High"],["High","Some concerns","High","Some concerns","Some concerns","Some concerns","Some concerns","Some concerns","High"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Study<\/th>\n      <th>D1<\/th>\n      <th>D2<\/th>\n      <th>D3<\/th>\n      <th>D4<\/th>\n      <th>D5<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":9,"headerCallback":"function(thead) {\n  $(thead).css('font-size', '17pt');\n}","dom":"t","columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[9,10,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-size':'17pt'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-size':'17pt'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-size':'17pt'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'font-size':'17pt'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'font-size':'17pt'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'font-size':'17pt'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'font-size':'17pt'});\n}"}},"evals":["options.headerCallback","options.rowCallback"],"jsHooks":[]}</script>
+
+???
+
+Domains:
+(1) bias arising from the randomization process;
+(2) bias due to deviations from intended interventions;
+(3) bias due to missing outcome data;
+(4) bias in measurement of the outcome;
+(5) bias in selection of the reported result.
+
+---
+
+## Making ROB figures was (is?) a pain
+
+No __readily available__ way to create risk-of-bias figures
+
+
+--
+
+Proprietary tools (__RevMan__) limited to certain reviews (__Cochrane__)
+
+???
+
+RevMan not open source
+
+--
+
+Process (PPT, Adobe, etc) was __time-consuming__ and __error-prone__
+
+???
+
+Hours clicking and dragging
+
+--
+
+&lt;br&gt;
+
+.center[
+
+.larger[
+
+**Q: Can I make this process any easier?**
+
+]
+
+]
+
+---
+
+class: inverse, center, middle
+
+# Chapter 2:
+# Development &amp; Demo
+
+---
+
+.pull-left[
+
+## In the beginning...
+
+&lt;br&gt;
+* Collection of local non-reproducible R scripts
+&lt;br&gt;
+
+* **UNTIL...** Evidence Synthesis Hackathon 2019, Canberra, Australia
+
+]
+
+.pull-right[
+.middle[
+.center[
+
+![](figures/esh_hex.png)
+
+]]]
+
+
+
+---
+
+## `robvis` 
+
+During __ESH__, the `robvis` __R package__ was born
+
+--
+
+Aim -  to create __publication-quality__ risk-of-bias visualisations
+
+--
+
+A __web app__ was added later to __maximise potential users__
+
+--
+
+Initially could produce __two types of plots:__
+* Traffic-light plots
+* Summary barplots
+
+???
+
+risk of bias assessment a key part of the systematic review process
+
+Familiar to anyone who has done a systematic review before.
+
+robvis built to make these data more visually appealing
+
+---
+
+class: larger
+
+
+```r
+robvis::data_rob2 # ROB2 example dataset included in robvis
+```
+
+--
+
+<div id="htmlwidget-b9b40f8937d830cb860c" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b9b40f8937d830cb860c">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["Study 1","Study 2","Study 3","Study 4","Study 5","Study 6","Study 7","Study 8","Study 9"],["Low","Some concerns","No information","Low","High","Low","Low","Low","Low"],["Low","Low","Low","Low","High","High","Some concerns","Some concerns","Low"],["Low","Low","Some concerns","High","Low","Some concerns","Some concerns","Low","High"],["Low","Low","Low","Low","Low","Low","High","Low","Low"],["Low","Low","Low","Some concerns","Some concerns","Low","Low","Low","Low"],["Low","Low","Some concerns","High","Low","Some concerns","Some concerns","Low","High"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Study<\/th>\n      <th>D1<\/th>\n      <th>D2<\/th>\n      <th>D3<\/th>\n      <th>D4<\/th>\n      <th>D5<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":9,"headerCallback":"function(thead) {\n  $(thead).css('font-size', '17pt');\n}","dom":"t","columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[9,10,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-size':'17pt'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-size':'17pt'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-size':'17pt'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'font-size':'17pt'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'font-size':'17pt'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'font-size':'17pt'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'font-size':'17pt'});\n}"}},"evals":["options.headerCallback","options.rowCallback"],"jsHooks":[]}</script>
+
+---
+
+class: center
+
+## Traffic-light plots
+
+.image-small[![](figures/traffic.png)]
+
+???
+
+Example presented is of RoB2 tool for RCT
+
+Studies along the right hand side, domains of bias along the left
+
+---
+class: center
+##  Summary bar-plots 
+
+&lt;br&gt;
+
+![](figures/summary.png)
+
+???
+
+Same data as before just presented as a bar chart instead
+
+Can be weighted so that the proportion of information rather than the proportion of studies at each risk of bias level is shown.
+
+---
+
+class: center, middle
+
+## [**Demo**](https://mcguinlu.shinyapps.io/robvis/)
+
+???
+
+Just to illustrate how easy it is to use
+
+---
+
+class: inverse, center, middle
+
+# Chapter 3:
+# Reception
+
+---
+
+## Reception
+
+Paper published in 2019:
+
+.small[
+&gt; _Luke A McGuinness and Julian PT Higgins (2020). Risk-of-bias VISualization (robvis): An R package and Shiny web app for visualizing risk-of-bias assessments Research Synthesis Methods. https://doi.org/10.1002/jrsm.1411_
+]
+
+--
+
+Since then:
+
+* .small[Citations: &gt;750]
+
+--
+
+* .small[Downloads: &gt;500/month]
+
+--
+
+* .small[Emails asking for help: &gt;15/month]
+
+---
+class: center
+
+## &gt;30k visitors to the `robvis` web app
+.middle[
+
+![](figures/user_map.jpg)]
+
+???
+
+&gt;30000 visitors over 3 years
+
+---
+
+class: center
+
+
+## `robvis` was much more successful than expected!
+
+--
+
+&lt;img src="figures/finding-nemo-bags.gif"
+     width="1100px" height="480px"&gt;
+???
+
+So on the basis that I now have an 
+
+Essential question: what else can or should robvis be able to do?
+
+---
+
+class: inverse, center, middle
+
+# Chapter 4:
+# The (New) Problem(s)
+
+---
+
+class: large
+
+##  Limitations of the current approach 
+
+.pull-left[
+.small[
+Risk-of-bias assessments are performed __BUT__ data is relegated to the supplementary material
+
+Better to try and __pair__ the assessments to their respective results
+
+Also useful to perform __sub-group meta-analysis__ by risk-of-bias level
+]
+]
+
+.pull-right[
+![](figures/paired_ROB2.png)
+
+]
+
+???
+
+Insufficient to simply perform the assessments, create the figure and not actively think about what this means for your meta-analysis
+
+---
+class: center, middle
+
+.left-column[
+__Problem illustrated by meta-epidemiology studies (reviews of reviews)__
+
+__Not all reviews make use of ROB data in synthesis__
+]
+
+![](figures/incorp_1.jpg)
+&lt;br&gt;
+&lt;br&gt;
+![](figures/incorp_2.jpg)
+
+.footer[https://doi.org/10.1136/jech-2014-204711, https://doi.org/10.1136/bmjnph-2021-000248]
+
+---
+
+class: Largest
+
+## New problems
+
+How can **robvis** help to:
+
+1. ... **incorporate ROB assessments** into synthesis?
+
+--
+
+1. ... highlight **meta-biases**?
+
+--
+
+&lt;br&gt;
+
+.small[
+__Note -__ currently only available via development version:
+
+
+```r
+devtools::install_github("mcguinlu/robvis")
+```
+]
+---
+
+class: inverse, center, middle
+
+# Chapter 5:
+# New functionality
+
+---
+
+class: middle
+
+##  Dummy data
+
+Generate _realistic_ example risk-of-bias assessments
+
+???
+
+---
+
+## Dummy data
+
+Need for __"realistic"__ example risk-of-bias assessment datasets
+
+???
+
+One thing I never expected was that robvis would now be used in teaching
+
+As such, there is a need to be able to general
+
+Each judgement within the has a different expected frequency
+
+--
+
+
+```r
+data_rob2[5,] # 5th study in the ROB2 example dataset
+```
+
+<div id="htmlwidget-44a001d637b42489ed8a" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-44a001d637b42489ed8a">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["Study 5"],["High"],["High"],["Low"],["Low"],["Some concerns"],["Low"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Study<\/th>\n      <th>D1<\/th>\n      <th>D2<\/th>\n      <th>D3<\/th>\n      <th>D4<\/th>\n      <th>D5<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":1,"headerCallback":"function(thead) {\n  $(thead).css('font-size', '13pt');\n}","dom":"t","columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[1,10,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-size':'13pt'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-size':'13pt'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-size':'13pt'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'font-size':'13pt'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'font-size':'13pt'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'font-size':'13pt'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'font-size':'13pt'});\n}"}},"evals":["options.headerCallback","options.rowCallback"],"jsHooks":[]}</script>
+
+--
+
+
+```r
+rob_dummy(3) # Three randomly generated assessments for ROB2, with appropriate 'Overall' values
+```
+
+<div id="htmlwidget-6ea9096134d32096c62f" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6ea9096134d32096c62f">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["Study 1","Study 2","Study 3"],["Low","Some concerns","High"],["Low","Low","Some concerns"],["Low","Some concerns","High"],["Low","Low","Low"],["Low","Low","Low"],["Low","Some concerns","High"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Study<\/th>\n      <th>D1<\/th>\n      <th>D2<\/th>\n      <th>D3<\/th>\n      <th>D4<\/th>\n      <th>D5<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"headerCallback":"function(thead) {\n  $(thead).css('font-size', '13pt');\n}","dom":"t","columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-size':'13pt'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-size':'13pt'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-size':'13pt'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'font-size':'13pt'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'font-size':'13pt'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'font-size':'13pt'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'font-size':'13pt'});\n}"}},"evals":["options.headerCallback","options.rowCallback"],"jsHooks":[]}</script>
+
+???
+
+rob_dummy() also takes a `tool` argument, so that you can generate assessments for multiple different ROB tools
+
+---
+
+class: middle
+
+## Paired forest plots
+
+Integrate metafor + robvis to produce _paired_ forest/risk-of-bias plots
+
+???
+
+Going to walk you though an example of producing these paired using metafor, and robvis
+
+---
+
+## Paired forest plots
+
+Create "paired" dataset:
+
+
+
+<div id="htmlwidget-a7b752ef450b19cc9d79" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a7b752ef450b19cc9d79">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["Aronson","Ferguson &amp; Simes"],[1948,1949],[-0.89,-1.59],[0.33,0.19],["Low","Some concerns"],["Low","Low"],["Low","High"],["Low","Some concerns"],["High","No information"],["High","High"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>author<\/th>\n      <th>year<\/th>\n      <th>yi<\/th>\n      <th>vi<\/th>\n      <th>D1<\/th>\n      <th>D2<\/th>\n      <th>D3<\/th>\n      <th>D4<\/th>\n      <th>D5<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":2,"headerCallback":"function(thead) {\n  $(thead).css('font-size', '16pt');\n}","dom":"t","columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[2,10,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-size':'16pt'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-size':'16pt'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-size':'16pt'});\nvar value=data[3]; $(this.api().cell(row, 3).node()).css({'font-size':'16pt'});\nvar value=data[4]; $(this.api().cell(row, 4).node()).css({'font-size':'16pt'});\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'font-size':'16pt'});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'font-size':'16pt'});\nvar value=data[7]; $(this.api().cell(row, 7).node()).css({'font-size':'16pt'});\nvar value=data[8]; $(this.api().cell(row, 8).node()).css({'font-size':'16pt'});\nvar value=data[9]; $(this.api().cell(row, 9).node()).css({'font-size':'16pt'});\n}"}},"evals":["options.headerCallback","options.rowCallback"],"jsHooks":[]}</script>
+
+???
+
+Example dataset that uses:
+  metadat::dat.bcg
+  rob_dummy
+  
+Only showing the first two rows here for illustration purposes, but there are 13 results in total
+
+--
+
+&lt;br&gt;
+Perform straightforward RE meta-analysis using `metafor`:
+
+
+```r
+res &lt;- metafor::rma(yi, # Effect sizes
+                    vi, # Sampling variances
+                    data = dat, # Dataset
+                    slab = paste(author,year)) # Study label
+```
+
+
+???
+
+So we use the escalc function to generate our study effect sizes and sampling variances from the raw counts
+
+This data is then passed to a simple random effects meta-analytical model, and the results are stored in the `res` object.
+
+---
+
+## Paired forest plots
+
+
+```r
+metafor::forest(res)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+Once we have the results of our meta-analysis
+
+And this is the standard approach.
+
+I'm now going to walk you through two ways in which robvis can add to this standard approach.
+
+---
+
+## Paired forest plots
+
+`rob_forest()`
+
+* Drop-in replacement for **metafor::forest()**
+
+* Maintains pairing between __result__ and __bias assessment__
+
+* Allows for subgroup analysis by __overall risk-of-bias level__
+
+---
+
+
+
+
+```r
+rob_forest(res)
+```
+
+![](figures/rob_forest.jpg)
+
+
+???
+
+This function acts as a wrapper to the metafor::forest function and appends a risk of bias plot to the right hand side
+
+This is only possible due to the foresight of the metafor package developer, who ensured that the forest function could be built upon.
+
+Takes whatever meta-analytical model you have specified (though limited to metafor for now) and applies it across studies grouped by risk of bias level.
+
+Presents test of difference between the different 
+
+
+---
+
+## Case study: Ivermectin for COVID-19
+
+Study of 12 trials of __Ivermectin__ for treatment of __COVID-19__
+
+--
+
+__Protective overall effect__ - OR: 0.62 (95%CI: 0.39-0.99)
+
+--
+
+Re-analysis performed ROB assessments of included trials:
+
+* 4 at Low
+* 4 at Some concerns
+* 3 at High
+* 1 at critical (excluded)
+
+.footer[https://www.researchsquare.com/article/rs-1003006/v1]
+
+???
+
+Re-analysis by Hill, Mirchandani, and Pilkington 
+
+---
+
+## Case study: Ivermectin for COVID-19
+
+&lt;img src="figures/rob_ivermectin.jpg"
+     height="500px"&gt;
+
+??? 
+
+1 study excluded as critical risk of bias
+
+No domain-level information
+
+In summary, risk-of-bias assesments should be presented alongside their corresponding numerical result in forest plots, as it allows you to easily assess the underlying validity of information going into the meta-analysis.
+
+---
+
+## Risk of bias due to missing evidence (ROB-ME)
+
+New tool to assess bias at the level of the synthesis:
+.small[
+
+* Known unknowns: results we know are missing
+
+* Unknown unknowns: results we have no idea exist
+
+]
+
+`robvis` allows for the result of this assessment to be included in the plot
+
+.footer[https://www.riskofbias.info/welcome/rob-me-tool]
+
+---
+
+
+
+
+```r
+rob_forest(res, rob_me = "High")
+```
+
+![](figures/rob_forest_me.jpg)
+
+---
+
+class: inverse, center, middle
+
+# Chapter 6:
+# To summarise...
+
+---
+
+##  Take-home messages 
+
+* Risk-of-bias assessments should be __presented alongside the corresponding result__
+
+* Risk-of-bias level should be investigated as a __source of heterogeneity__
+
+* Readers should be made aware of the risk of __meta-bias__ in an analysis
+
+* New functionality in `robvis` __can help__ with this!
+
+---
+
+## Where to next? Bias direction plots!
+
+Optional question at end of each domain- e.g. D1 of ROBINS-I:
+.small[
+&gt; What is the predicted direction of
+bias due to confounding?
+
+&gt;Favours experimental /Favours comparator/ Unpredictable
+]
+
+![](figures/direction.jpg)
+
+---
+
+class: larger
+
+##  Further info 
+
+__See docs/info at:__
+* Package website: [mcguinlu.github.io/robvis/](https://mcguinlu.github.io/robvis)
+* Shiny app: [mcguinlu.shinyapps.io/robvis/](https://mcguinlu.shinyapps.io/robvis/)
+	
+__Paper introducing `robvis`:__
+* McGuinness, L. A., &amp; Higgins, J. P. (2020). Risk-of-bias VISualization (robvis): An R package and Shiny web app for visualizing risk-of-bias assessments. Research Synthesis Methods .
+
+__Contribute to the package__:
+* Open an issue on the GitHub repository
+* Tweet at me ([@mcguinlu](https://twitter.com/mcguinlu))
+* Send me an email (luke.a.mcguinness\[at\]gmail.com)
+
+&lt;br&gt;
+
+.center[__Thanks to `robvis` contributors Randall Boyes and Alex Fowler for all their support!__]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="cols_macro.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"ratio": "16:9",
+"highlightSpans": true,
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
