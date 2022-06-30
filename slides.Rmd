@@ -28,7 +28,8 @@ library(metafor)
 library(robvis)
 cache <- TRUE
 library(dplyr)
-xaringanExtra::use_xaringan_extra(c("tile_view", "webcam","scribble"))
+xaringanExtra::use_xaringan_extra(c("tile_view", "webcam"))
+xaringanExtra::use_scribble()
 
 table <- function(dat, fontsize="11pt", rows = nrow(dat)){
 DT::datatable(
